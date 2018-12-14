@@ -35,7 +35,7 @@ class fmtstr_rel:
                     s.connect(tar)
                     skip_num = off // self.addrlen
                     tst = b"%c" * (skip_num + num)
-                    tst += b"%0" + str(self.leaklen).encode() + b"lx"
+                    tst += b"%0" + str(self.leaklen).encode() + self.lk
                     st = pwn(s, tst, skip_num + num + self.leaklen)
                     val = int(st[skip_num + num:][:self.leaklen], 16)
             except Exception as e:
