@@ -11,3 +11,17 @@ def recv_until(sock, delim):
 		except InterruptedError:
 			pass
 	return tmp
+
+def recv_all(sock):
+	tmp = b''
+	while True:
+		try:
+			r = sock.recv(1)
+			if not r:
+				break
+			tmp += r
+		except InterruptedError:
+			pass
+		except:
+			break
+	return tmp
