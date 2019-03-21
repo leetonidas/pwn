@@ -89,10 +89,25 @@ class fmtstr_rel:
 
 
 class fmtstr:
+    """Class building formatstring exploits
+
+    This class can be used to build format Strings.
+    It supports 32 and 64 bit address widths. The number
+    of bytes to be written at a time can be adjusted and
+    the overwrites will be split and reordered to reduce the
+    output size of the printed format string.
+    """
+
     def __init__(self, addrlen = 8):
         self.addrlen = addrlen
 
     def split(self, fmt, mlen):
+        """splits the arguments into 1,2,4 or 8 bytes written at a time
+
+        This function takes leading zeros into account and includes
+        their write into the write of the lower values
+        """
+
         pos, l, dat = fmt
         if mlen not in [1,2,4,8]:
             raise "error"
@@ -108,6 +123,8 @@ class fmtstr:
         return self.split((pos, l // 2, dat & (2 ** (l * 4) - 1)), mlen) + self.split((pos + l // 2, l // 2, dat >> (l * 4)), mlen)
 
     def fmt(self, ind, l):
+        """picks the right length modifier"""
+
         ret = "%" + str(ind) + "$"
         if l == 1:
             ret += "hh"
@@ -118,6 +135,13 @@ class fmtstr:
         return ret + "n"
 
     def fill(self, l, pos = 0, pad = None):
+        """creates appropriate padding
+
+        takes requested placement of padding into account
+        and uses static strings for padding length <= 3 as
+        the string is at most as long
+        """
+
         if pad == None:
             if l < 3:
                 return "A" * l
@@ -141,6 +165,8 @@ class fmtstr:
         return ret
 
     def sanitize(self, fmt):
+        """restricts the value to the number of bytes written"""
+
         addr, l, dat = fmt
         return (addr, l, dat & (2 ** (l * 8) - 1))
 
@@ -149,6 +175,29 @@ class fmtstr:
             print(hex(addr) + "[:"+str(l) + "] := " + hex(val))
 
     def format(self, stuff, mlen, st, extra, pad, debug = False):
+        """creates the formantstring
+
+        Parameters
+        ----------
+        stuff : List[Tuple[int, int, int]]
+            A list of tuples (target, length, value)
+        mlen : int
+            Number of Bytes written at a time
+        st : int
+            the index corresponding to the first bytes of the formatstring
+            aka, if the first element would be an injected address, this
+            parameter is the index that would be used for indexed addressing
+        extra : List[Tuple[int, str]]
+            additional stuff added to the formatstring (like %s), backed by an address
+        pad : (int, str)
+            specific text to be placed in the output of the format string
+
+        Returns
+        -------
+        bytes
+            the formatstring
+        """
+
         pwn = ""
         arg_st = st
         if debug:
@@ -179,5 +228,5 @@ class fmtstr:
         if self.addrlen == 4:
             letter = 'I'
         pwn += struct.pack('<' + letter * (len(fmts) + len(extra)), *list(map(lambda x:x[0], fmts + extra)))
-        print(pwn)
+        #print(pwn)
         return pwn
