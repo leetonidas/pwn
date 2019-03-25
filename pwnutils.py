@@ -58,5 +58,5 @@ class FlagSock(socket.socket):
 			self.flagbuf = self.flagbuf[res[0]:]
 			with open(self.flagfile, "ab") as ff:
 				ff.write(res[1])
-		self.flagbuf = self.flagbuf[:self.flagbuflen]
+		self.flagbuf = self.flagbuf[-self.flagbuflen:]
 		return tmp
