@@ -2,6 +2,7 @@
 
 import socket
 import re
+import numpy as np
 
 def recv_until(sock, delim):
 	tmp = b''
@@ -60,3 +61,36 @@ class FlagSock(socket.socket):
 				ff.write(res[1])
 		self.flagbuf = self.flagbuf[-self.flagbuflen:]
 		return tmp
+import numpy as np
+
+class crand:
+    def __init__(self, seed=None):
+        if seed == 0:
+            seed = 1
+        self.front = 3
+        self.back = 0
+        if seed is None:
+            self.rands = [*map(np.int32, [-1726662223, 379960547, 1735697613, 1040273694, 1313901226,
+                        1627687941, -179304937, -2073333483, 1780058412, -1989503057,
+                        -615974602, 344556628, 939512070, -1249116260, 1507946756,
+                        -812545463, 154635395, 1388815473, -1926676823, 525320961,
+                        -1009028674, 968117788, -123449607, 1284210865, 435012392,
+                        -2017506339, -911064859, -370259173, 1132637927, 1398500161,
+                        -205601318])]
+        else:
+            self.rands = [np.int32(seed)]
+            word = np.int32(seed)
+            for i in range(1, 31):
+                self.rands.append((16807 * self.rands[-1]) % 2147483647)
+            for i in range(len(self.rands) * 10):
+                self.next() 
+
+    def __iter__(self):
+    	return self
+
+    def __next__(self):
+        self.rands[self.front] = np.int32(self.rands[self.front] + self.rands[self.back])
+        result = np.uint32(self.rands[self.front]) >> 1
+        self.front = (self.front + 1) % len(self.rands)
+        self.back = (self.back + 1) % len(self.rands)
+        return result
