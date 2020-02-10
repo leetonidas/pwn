@@ -40,7 +40,7 @@ def solve_pow(prefix, bits):
     # draufficken
     rnd = 0
     while True:
-        fun(np.uint64(rnd), cuda.In(pref), np.uint64(pref.shape[0]), np.uint32(mask), cuda.InOut(res), block=(1024,1,1), grid=(40,1,1))
+        fun(np.uint64(rnd), cuda.In(pref), np.uint64(pref.shape[0]), np.uint32(mask), cuda.InOut(res), block=(256,1,1), grid=(40,1,1))
         if res[0] != 0:
             break
         rnd += 1

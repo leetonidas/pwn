@@ -75,9 +75,9 @@ __global__ void sha256_crypt_kernel(ulong start, uint *prefix, ulong plen, uint 
 
   id = get_global_id();
 
-  if (id == 0) {
-    printf("%08x\n", start);
-  }
+  //if (id == 0) {
+  //  printf("%08x\n", start);
+  //}
 
   // brutforce is build up as: prefix | thr_id:04x | <rnd>:04x | start:08x
   for (t = 0; t < plen; ++t) {
