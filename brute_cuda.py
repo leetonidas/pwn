@@ -21,7 +21,8 @@ msg = np.array([i >> 64] + [i & 0xffffffff] + [0] * 12 + [24], dtype=np.dtype("u
 def dev_fits(d):
     return d.endian_little
 
-def solve_pow(prefix, bits):
+def solve_pow(prefix, bits, ha="sha256"):
+    print(f"bruting {ha} for {bits} 0 bits")
 
     # prefix input
     prefix = prefix.ljust(((len(prefix) + 3) >> 2) << 2, b"0")
@@ -30,10 +31,10 @@ def solve_pow(prefix, bits):
     # output
     res = np.array([0,0,0], "uint32")
 
-    # load program    
-    with open("sha256.cu", "r") as f:
+    # load program
+    with open(f"{ha}.cu", "r") as f:
         m = cudac.SourceModule(f.read())
-    fun = m.get_function("sha256_crypt_kernel")
+    fun = m.get_function("crypt_kernel")
     
     mask = (0xffffffff << (32 - bits)) & 0xffffffff
 
@@ -51,5 +52,8 @@ def solve_pow(prefix, bits):
     return res
 
 if __name__ == "__main__":
-    if len(sys.argv) == 3:
-        print(solve_pow(sys.argv[1].encode(), int(sys.argv[2])).decode())
+    if len(sys.argv) >= 3:
+        ha = "sha256"
+        if len(sys.argv) == 4:
+            ha = sys.argv[3]
+        print(solve_pow(sys.argv[1].encode(), int(sys.argv[2]), ha).decode())

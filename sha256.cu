@@ -68,7 +68,7 @@ uint get_global_id() {
   return threadIdx.x + threadsPerBlock * blockId;
 }
 
-__global__ void sha256_crypt_kernel(ulong start, uint *prefix, ulong plen, uint mask, uint *match){
+__global__ void crypt_kernel(ulong start, uint *prefix, ulong plen, uint mask, uint *match){
   int t;
   uint W[80], rnd, id, A,B,C,D,E,F,G,H,T1,T2;
   uint Ws[16];
